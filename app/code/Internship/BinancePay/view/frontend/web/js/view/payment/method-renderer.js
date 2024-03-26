@@ -10,8 +10,8 @@ define(
         'use strict';
         rendererList.push(
             {
-                type: 'custompayment',
-                component: 'Internship_BinancePay/js/view/payment/method-renderer/custompayment'
+                type: 'binancepay',
+                component: 'Internship_BinancePay/js/view/payment/method-renderer/binancepay'
             }
         );
         return Component.extend({});
