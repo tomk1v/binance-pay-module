@@ -28,6 +28,7 @@ define(
                     showLoader: true,
                     data: {
                         quoteData: window.checkoutConfig.quoteData,
+                        quoteItems: window.checkoutConfig.quoteItemData
                     },
                     dataType: 'json',
                     type: 'POST',
@@ -37,7 +38,8 @@ define(
                         } else {
                             console.error('Error occurred:', response);
                             alert('An error occurred. Please try again later.');
-                        }                    }
+                        }
+                    }
                 });
             },
 
