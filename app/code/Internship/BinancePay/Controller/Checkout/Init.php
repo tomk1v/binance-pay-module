@@ -20,12 +20,13 @@ class Init implements \Magento\Framework\App\ActionInterface
      * @param \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig
      */
     public function __construct(
-        protected \Magento\Framework\App\Action\Context $context,
+        protected \Magento\Framework\App\Action\Context            $context,
         protected \Magento\Framework\Controller\Result\JsonFactory $jsonFactory,
-        protected \Magento\Framework\HTTP\Client\CurlFactory $curlFactory,
-        protected \Magento\Framework\App\Request\Http $request,
-        protected \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig
-    ){
+        protected \Magento\Framework\HTTP\Client\CurlFactory       $curlFactory,
+        protected \Magento\Framework\App\Request\Http              $request,
+        protected \Internship\BinancePay\Helper\Adminhtml\Config   $adminConfig
+    )
+    {
     }
 
     /**
@@ -36,25 +37,24 @@ class Init implements \Magento\Framework\App\ActionInterface
     public function execute()
     {
         $quoteData = $this->request->getParam('quoteData');
-
+        $quoteItems = $this->request->getParam('quoteItems');
         $nonce = $this->generateNonce();
         $timestamp = round(microtime(true) * 1000);
 
         $request = [
-            "env" => [
-                "terminalType" => "APP"
+            'env' => [
+                'terminalType' => 'WEB'
             ],
-            "merchantTradeNo" => mt_rand(982538, 9825382937292),
-            "orderAmount" => floatval(0.001),
-            "currency" => "USDT",
-            "goods" => [
-                "goodsType" => "01",
-                "goodsCategory" => "D000",
-                "referenceGoodsId" => "7876763A3B",
-                "goodsName" => "Ice Cream",
-                "goodsDetail" => "Greentea ice cream cone"
+            'orderTags' => [
+                'ifProfitSharing' => false
             ],
-            "webhookUrl" => ''
+            'merchantTradeNo' => $this->generateUniqueMerchantTradeNo(),
+            'orderAmount' => '0.00000001',
+            'currency' => 'USDT',
+            'description' => 'very good Ice Cream',
+            'goodsDetails' => $this->generateGoods($quoteItems),
+//            'returnUrl' => 'https://2cf0-188-163-32-149.ngrok-free.app/binancepay/checkout/success',
+//            'webhookUrl' => 'https://2cf0-188-163-32-149.ngrok-free.app/binancepay/checkout/webhook'
         ];
 
         $json_request = json_encode($request);
@@ -72,7 +72,7 @@ class Init implements \Magento\Framework\App\ActionInterface
         /** @var \Magento\Framework\HTTP\Client\Curl $curl */
         $curl = $this->curlFactory->create();
         $curl->setHeaders($headers);
-        $curl->post("https://bpay.binanceapi.com/binancepay/openapi/v2/order", $json_request);
+        $curl->post("https://bpay.binanceapi.com/binancepay/openapi/v3/order", $json_request);
         $result = $curl->getBody();
 
         $result = json_decode($result, true);
@@ -96,5 +96,31 @@ class Init implements \Magento\Framework\App\ActionInterface
             $nonce .= $char;
         }
         return $nonce;
+    }
+
+    function generateUniqueMerchantTradeNo()
+    {
+        $datetime = new \DateTime();
+        $timestamp = $datetime->format('YmdHis');
+        $randomString = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 6);
+
+        $merchantTradeNo = $timestamp . $randomString;
+
+        return $merchantTradeNo;
+    }
+
+    function generateGoods($quoteItems)
+    {
+        $goodsArray = [];
+
+        foreach ($quoteItems as $item) {
+            $goodsArray[] = [
+                'goodsType' => '01',
+                'goodsName' => $item['name'],
+                'referenceGoodsId' => $item['sku']
+            ];
+        }
+
+        return $goodsArray;
     }
 }
