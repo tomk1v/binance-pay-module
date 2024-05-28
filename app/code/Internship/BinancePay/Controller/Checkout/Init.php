@@ -24,9 +24,10 @@ class Init implements \Magento\Framework\App\ActionInterface
         protected \Magento\Framework\Controller\Result\JsonFactory $jsonFactory,
         protected \Magento\Framework\HTTP\Client\CurlFactory       $curlFactory,
         protected \Magento\Framework\App\Request\Http              $request,
-        protected \Internship\BinancePay\Helper\Adminhtml\Config   $adminConfig
-    )
-    {
+        protected \Internship\BinancePay\Helper\Adminhtml\Config   $adminConfig,
+        protected \Magento\Checkout\Model\Session $session,
+        protected \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement
+    ) {
     }
 
     /**
@@ -36,54 +37,61 @@ class Init implements \Magento\Framework\App\ActionInterface
      */
     public function execute()
     {
-        $quoteData = $this->request->getParam('quoteData');
-        $quoteItems = $this->request->getParam('quoteItems');
-        $nonce = $this->generateNonce();
-        $timestamp = round(microtime(true) * 1000);
+        try {
+            $quote = $this->session->getQuote();
 
-        $request = [
-            'env' => [
-                'terminalType' => 'WEB'
-            ],
-            'orderTags' => [
-                'ifProfitSharing' => false
-            ],
-            'merchantTradeNo' => $this->generateUniqueMerchantTradeNo(),
-            'orderAmount' => '0.00000001',
-            'currency' => 'USDT',
-            'description' => 'very good Ice Cream',
-            'goodsDetails' => $this->generateGoods($quoteItems),
+            $nonce = $this->generateNonce();
+            $timestamp = round(microtime(true) * 1000);
+
+            $request = [
+                'env' => [
+                    'terminalType' => 'WEB'
+                ],
+                'orderTags' => [
+                    'ifProfitSharing' => false
+                ],
+                'merchantTradeNo' => $this->generateUniqueMerchantTradeNo(),
+                'orderAmount' => '0.00000001',
+                'currency' => 'USDT',
+                'description' => 'very good Ice Cream',
+                'goodsDetails' => $this->generateGoods($quote->getItems()),
 //            'returnUrl' => 'https://2cf0-188-163-32-149.ngrok-free.app/binancepay/checkout/success',
 //            'webhookUrl' => 'https://2cf0-188-163-32-149.ngrok-free.app/binancepay/checkout/webhook'
-        ];
+            ];
 
-        $json_request = json_encode($request);
-        $payload = $timestamp . "\n" . $nonce . "\n" . $json_request . "\n";
+            $json_request = json_encode($request);
+            $payload = $timestamp . "\n" . $nonce . "\n" . $json_request . "\n";
 
-        $signature = strtoupper(hash_hmac('SHA512', $payload, $this->adminConfig->getSecretKey()));
-        $headers = [
-            "Content-Type" => "application/json",
-            "BinancePay-Timestamp" => $timestamp,
-            "BinancePay-Nonce" => $nonce,
-            "BinancePay-Certificate-SN" => $this->adminConfig->getApiKey(),
-            "BinancePay-Signature" => $signature
-        ];
+            $signature = strtoupper(hash_hmac('SHA512', $payload, $this->adminConfig->getSecretKey()));
+            $headers = [
+                "Content-Type" => "application/json",
+                "BinancePay-Timestamp" => $timestamp,
+                "BinancePay-Nonce" => $nonce,
+                "BinancePay-Certificate-SN" => $this->adminConfig->getApiKey(),
+                "BinancePay-Signature" => $signature
+            ];
 
-        /** @var \Magento\Framework\HTTP\Client\Curl $curl */
-        $curl = $this->curlFactory->create();
-        $curl->setHeaders($headers);
-        $curl->post("https://bpay.binanceapi.com/binancepay/openapi/v3/order", $json_request);
-        $result = $curl->getBody();
+            /** @var \Magento\Framework\HTTP\Client\Curl $curl */
+            $curl = $this->curlFactory->create();
+            $curl->setHeaders($headers);
+            $curl->post("https://bpay.binanceapi.com/binancepay/openapi/v3/order", $json_request);
+            $result = $curl->getBody();
 
-        $result = json_decode($result, true);
+            $result = json_decode($result, true);
 
-        if ($result['status'] == 'SUCCESS') {
-            $result = ['success' => true, 'checkoutUrl' => $result['data']['checkoutUrl']];
+            if ($result['status'] == 'SUCCESS') {
+                $paymentMethod = $this->paymentMethodManagement->get($quote->getId());
+                $paymentMethod->setBinancePrepayId($result['data']['prepayId'])->save();
+
+                $result = ['success' => true, 'checkoutUrl' => $result['data']['checkoutUrl']];
+            }
+
+            $resultJson = $this->jsonFactory->create();
+            $resultJson->setData($result);
+            return $resultJson;
+        } catch (\Exception $exception) {
+            throw new \Exception($exception->getMessage());
         }
-
-        $resultJson = $this->jsonFactory->create();
-        $resultJson->setData($result);
-        return $resultJson;
     }
 
     protected function generateNonce($length = 32)

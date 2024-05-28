@@ -26,12 +26,7 @@ define(
                 $.ajax({
                     url: '/binancepay/checkout/init',
                     showLoader: true,
-                    data: {
-                        quoteData: window.checkoutConfig.quoteData,
-                        quoteItems: window.checkoutConfig.quoteItemData
-                    },
-                    dataType: 'json',
-                    type: 'POST',
+                    type: 'GET',
                     success: function (response) {
                         if (response.success) {
                             window.location.href = response.checkoutUrl;

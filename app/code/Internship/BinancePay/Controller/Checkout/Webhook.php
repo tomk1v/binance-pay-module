@@ -29,7 +29,11 @@ class Webhook implements \Magento\Framework\App\ActionInterface, \Magento\Framew
         protected \Magento\Checkout\Model\Session $checkoutSession,
         protected \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         protected \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        protected \Magento\Quote\Api\CartManagementInterface $cartManagement
+        protected \Magento\Quote\Api\CartManagementInterface $cartManagement,
+        protected \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
+        protected \Magento\Quote\Model\ResourceModel\Quote\Payment\CollectionFactory $quotePaymentCollectionFactory,
+        protected \Magento\Framework\MessageQueue\PublisherInterface $publisher,
+        protected \Internship\BinancePay\Model\OrderCreationPublisher $orderCreationPublisher
     ){
     }
 
@@ -40,57 +44,21 @@ class Webhook implements \Magento\Framework\App\ActionInterface, \Magento\Framew
      */
     public function execute()
     {
-        // Get the JSON factory result
         $resultJson = $this->jsonFactory->create();
-
-        // Get the body of the request
         $body = $this->request->getContent();
-        $data = json_decode($body, true);
+        $response = json_decode($body, true);
 
-        // Check if the status is PAY_SUCCESS
-        if (isset($data['bizStatus']) && $data['bizStatus'] === 'PAY_SUCCESS') {
-            // Decode the inner JSON data
-            $paymentData = json_decode($data['data'], true);
-
+        if (isset($response['bizStatus']) && $response['bizStatus'] === 'PAY_SUCCESS') {
             try {
-                // Create the order based on the payment data
-                $this->createOrder($paymentData);
-                return $resultJson->setData(['returnCode' => 'SUCCESS', "returnMessage" => 'Order created successfully']);
+//                $this->publisher->publish('binance_order_creation', $response);
+                $this->orderCreationPublisher->publish('test');
+                return $resultJson->setData(['returnCode' => 'SUCCESS', "returnMessage" => 'Order processing started']);
             } catch (\Exception $e) {
                 return $resultJson->setData(['returnCode' => 'ERROR', "returnMessage" => $e->getMessage()]);
             }
         }
 
         return $resultJson->setData(['returnCode' => 'SUCCESS', "returnMessage" => 'No action taken']);
-    }
-
-    /**
-     * Create an order based on the payment data.
-     *
-     * @param array $paymentData
-     * @throws \Exception
-     */
-    protected function createOrder(array $paymentData)
-    {
-        // Assuming $paymentData contains necessary information to create an order
-        $quote = $this->cartRepository->getActive($this->checkoutSession->getQuoteId());
-
-        // Set customer to quote if necessary
-        $customer = $this->customerRepository->getById($paymentData['openUserId']);
-        $quote->assignCustomer($customer);
-
-        // Set payment method
-        $quote->getPayment()->setMethod('binancepay');
-
-        // Collect totals & save quote
-        $quote->collectTotals()->save();
-
-        // Submit the quote and create the order
-        $orderId = $this->cartManagement->placeOrder($quote->getId());
-
-        if (!$orderId) {
-            throw new \Exception('Order could not be created');
-        }
     }
 
     public function createCsrfValidationException(\Magento\Framework\App\RequestInterface $request): ? \Magento\Framework\App\Request\InvalidRequestException
