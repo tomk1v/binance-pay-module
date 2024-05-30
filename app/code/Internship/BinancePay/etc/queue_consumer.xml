@@ -2,5 +2,5 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
     <consumer name="binance.order.creation" queue="binance.order.creation" connection="amqp"
-              handler="Internship\BinancePay\Model\OrderCreationConsumer::processMessage"/>
+              handler="Internship\BinancePay\Model\Queue\Order\Consumer::processMessage"/>
 </config>

@@ -1,8 +1,8 @@
 <?php
 
-namespace Internship\BinancePay\Model;
+namespace Internship\BinancePay\Model\Queue\Order;
 
-class OrderCreationConsumer
+class Consumer
 {
     protected $orderFactory;
     protected $checkoutSession;
@@ -32,12 +32,8 @@ class OrderCreationConsumer
 
     public function processMessage($message)
     {
-        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/custom.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        $logger->info('text message');
-//        $paymentData = json_decode($message->getBody(), true);
-//        $this->createOrder($paymentData);
+        $paymentData = json_decode($message, true);
+        $this->createOrder($paymentData);
     }
 
     protected function createOrder(array $paymentData)
