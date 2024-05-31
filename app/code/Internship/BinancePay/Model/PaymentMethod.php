@@ -49,6 +49,7 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
         $this->http = $http;
     }
 
+    //TODO: realize/refactor authorization
     /**
      * Authorize payment method
      *

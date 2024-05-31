@@ -12,7 +12,13 @@ namespace Internship\BinancePay\Controller\Checkout;
 
 class Success implements \Magento\Framework\App\ActionInterface
 {
-
+    /**
+     * @param \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
+     * @param \Magento\Framework\App\RequestInterface $request
+     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     */
     public function __construct(
         protected \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
         protected \Magento\Framework\App\RequestInterface $request,
@@ -23,23 +29,29 @@ class Success implements \Magento\Framework\App\ActionInterface
     }
 
     /**
-     * Execute controller action.
+     * Redirection to success page.
      *
      * @return \Magento\Framework\Controller\ResultInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
-        $params = $this->request->getParams();
-        $searchCriteria = $this->searchCriteriaBuilder->addFilter('quote_id', $params['quoteId'])->create();
-        $order = $this->orderRepository->getList($searchCriteria)->getFirstItem();
+        try {
+            $params = $this->request->getParams();
+            $searchCriteria = $this->searchCriteriaBuilder->addFilter('quote_id', $params['quoteId'])->create();
+            $order = $this->orderRepository->getList($searchCriteria)->getFirstItem();
 
-        $this->checkoutSession->setLastOrderId($order->getId());
-        $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
-        $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
-        $this->checkoutSession->setLastQuoteId($order->getQuoteId());
+            $this->checkoutSession->clearQuote();
+            $this->checkoutSession->setLastOrderId($order->getId());
+            $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
+            $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
+            $this->checkoutSession->setLastQuoteId($order->getQuoteId());
 
-        $resultRedirect = $this->resultRedirectFactory->create();
-        $resultRedirect->setPath('checkout/onepage/success');
-        return $resultRedirect;
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setPath('checkout/onepage/success');
+            return $resultRedirect;
+        } catch (\Magento\Framework\Exception\LocalizedException $exception) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($exception->getMessage()));
+        }
     }
 }
