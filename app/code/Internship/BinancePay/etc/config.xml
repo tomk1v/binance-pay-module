@@ -12,7 +12,6 @@
     <default>
         <payment>
             <binancepay>
-                <payment_action>authorize</payment_action>
                 <model>Internship\BinancePay\Model\PaymentMethod</model>
                 <active>1</active>
                 <title>Binance Pay</title>

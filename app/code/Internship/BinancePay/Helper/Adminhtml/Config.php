@@ -37,7 +37,6 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
         parent::__construct($context);
     }
 
-    //TODO: realize validation if module enable/disable
     /**
      * Get module status
      *
