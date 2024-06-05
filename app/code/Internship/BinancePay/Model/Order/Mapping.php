@@ -1,8 +1,9 @@
 <?php
 /**
- * @author Barwenock
- * @copyright Copyright (c) Barwenock
- * @package Social Authorizes for Magento 2
+ * @category Internship
+ * @package Internship\BinancePay
+ * @author Andrii Tomkiv <tomkivandrii18@gmail.com>
+ * @copyright 2024 Tomkiv
  */
 
 declare(strict_types=1);

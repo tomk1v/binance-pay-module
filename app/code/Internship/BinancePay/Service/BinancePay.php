@@ -15,12 +15,22 @@ class BinancePay
     protected const BUILD_ORDER_ENDPOINT = '/binancepay/openapi/v3/order';
     protected const GET_CERTIFICATE_ENDPOINT = '/binancepay/openapi/certificates';
 
+    /**
+     * @param \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig
+     * @param \Magento\Framework\HTTP\Client\CurlFactory $curlFactory
+     */
     public function __construct(
         protected \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig,
         protected \Magento\Framework\HTTP\Client\CurlFactory $curlFactory,
     ) {
     }
 
+    /**
+     * Builds an order with the provided body data.
+     *
+     * @param string $body
+     * @return array
+     */
     public function buildOrder($body)
     {
         $timestamp = $this->getTimestamp();
@@ -34,19 +44,33 @@ class BinancePay
         return json_decode($result, true);
     }
 
-    public function verifySignature($body, $headers): bool
+    /**
+     * Verifies the signature of the webhook request.
+     *
+     * @param string $body
+     * @param array $webhookHeaders
+     * @return bool
+     */
+    public function verifySignature($body, $webhookHeaders): bool
     {
         $timestamp = $this->getTimestamp();
-        $nonce = $headers['Binancepay-Nonce'];
-        $signature = base64_decode($headers['Binancepay-Signature']);
+        $nonce = $webhookHeaders['Binancepay-Nonce'];
+        $signature = base64_decode($webhookHeaders['Binancepay-Signature']);
 
-        $headers = $this->buildHeaders($timestamp, $nonce, $body);
-        $payload = $this->buildPayload($headers['Binancepay-Timestamp'], $nonce, $body);
-        $certificate = $this->getCertificate($headers, $body);
+        $requestHeaders = $this->buildHeaders($timestamp, $nonce, $body);
+        $payload = $this->buildPayload($webhookHeaders['Binancepay-Timestamp'], $nonce, $body);
+        $certificate = $this->getCertificate($requestHeaders, $body);
 
         return openssl_verify($payload, $signature, $certificate, OPENSSL_ALGO_SHA256) === 1;
     }
 
+    /**
+     * Retrieves the certificate public key from Binance API.
+     *
+     * @param array $headers
+     * @param string $body
+     * @return string
+     */
     protected function getCertificate(array $headers, string $body): string
     {
         $curl = $this->curlFactory->create();
@@ -57,6 +81,14 @@ class BinancePay
         return $result['data'][0]['certPublic'];
     }
 
+    /**
+     * Builds the headers required for Binance API requests.
+     *
+     * @param $timestamp
+     * @param $nonce
+     * @param $body
+     * @return array
+     */
     protected function buildHeaders($timestamp, $nonce, $body): array
     {
         return [
@@ -68,6 +100,12 @@ class BinancePay
         ];
     }
 
+    /**
+     * Generates a nonce string of the given length.
+     *
+     * @param $length
+     * @return string
+     */
     protected function generateNonce($length = 32)
     {
         return substr(
@@ -77,16 +115,35 @@ class BinancePay
         );
     }
 
+    /**
+     * Builds the payload for signature verification.
+     *
+     * @param $timestamp
+     * @param $nonce
+     * @param $body
+     * @return string
+     */
     protected function buildPayload($timestamp, $nonce, $body)
     {
         return "$timestamp\n" . "$nonce\n" . $body . "\n";
     }
 
+    /**
+     * Gets the current timestamp in milliseconds.
+     */
     protected function getTimestamp()
     {
         return round(microtime(true) * 1000);
     }
 
+    /**
+     * Generates a HMAC signature for the given data.
+     *
+     * @param $timestamp
+     * @param $nonce
+     * @param $body
+     * @return string
+     */
     protected function getSignature($timestamp, $nonce, $body)
     {
         return strtoupper(hash_hmac(
