@@ -55,7 +55,7 @@ class Consumer
                 ->addFieldToFilter('binance_prepay_id', $paymentData['bizIdStr'])
                 ->getFirstItem();
 
-            if ($payment) {
+            if ($payment->getId()) {
                 $quote = $this->cartRepository->getActive($payment->getQuoteId());
                 $orderId = $this->cartManagement->placeOrder($quote->getId());
 

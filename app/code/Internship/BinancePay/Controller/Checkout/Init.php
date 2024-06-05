@@ -13,125 +13,45 @@ namespace Internship\BinancePay\Controller\Checkout;
 class Init implements \Magento\Framework\App\ActionInterface
 {
     /**
-     * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $jsonFactory
-     * @param \Magento\Framework\HTTP\Client\CurlFactory $curlFactory
-     * @param \Magento\Framework\App\Request\Http $request
-     * @param \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig
+     * @param \Magento\Checkout\Model\Session $session
+     * @param \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement
+     * @param \Internship\BinancePay\Service\BinancePay $binancePayService
+     * @param \Internship\BinancePay\Model\Order\Mapping $orderMapping
      */
     public function __construct(
-        protected \Magento\Framework\App\Action\Context            $context,
         protected \Magento\Framework\Controller\Result\JsonFactory $jsonFactory,
-        protected \Magento\Framework\HTTP\Client\CurlFactory       $curlFactory,
-        protected \Magento\Framework\App\Request\Http              $request,
-        protected \Internship\BinancePay\Helper\Adminhtml\Config   $adminConfig,
         protected \Magento\Checkout\Model\Session $session,
         protected \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement,
-        protected \Magento\Framework\UrlInterface $url
+        protected \Internship\BinancePay\Service\BinancePay $binancePayService,
+        protected \Internship\BinancePay\Model\Order\Mapping $orderMapping
     ) {
     }
 
     /**
-     * Execute controller action.
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return \Magento\Framework\Controller\Result\Json
+     * @throws \Exception
      */
     public function execute()
     {
         try {
             $quote = $this->session->getQuote();
+            $body = json_encode($this->orderMapping->mapRequestBody($quote));
 
-            $nonce = $this->generateNonce();
-            $timestamp = round(microtime(true) * 1000);
+            $response = $this->binancePayService->buildOrder($body);
 
-            $url = $this->url->getUrl('binancepay/checkout/success');
-            $url = rtrim($url, '/');
-
-            $request = [
-                'env' => [
-                    'terminalType' => 'WEB'
-                ],
-                'orderTags' => [
-                    'ifProfitSharing' => false
-                ],
-                'merchantTradeNo' => $this->generateUniqueMerchantTradeNo(),
-                'orderAmount' => '0.00000001',
-                'currency' => 'USDT',
-                'description' => 'very good Ice Cream',
-                'goodsDetails' => $this->generateGoods($quote->getItems()),
-                'returnUrl' => $url . '?quoteId=' . $quote->getId()
-            ];
-
-            $json_request = json_encode($request);
-            $payload = $timestamp . "\n" . $nonce . "\n" . $json_request . "\n";
-
-            $signature = strtoupper(hash_hmac('SHA512', $payload, $this->adminConfig->getSecretKey()));
-            $headers = [
-                "Content-Type" => "application/json",
-                "BinancePay-Timestamp" => $timestamp,
-                "BinancePay-Nonce" => $nonce,
-                "BinancePay-Certificate-SN" => $this->adminConfig->getApiKey(),
-                "BinancePay-Signature" => $signature
-            ];
-
-            /** @var \Magento\Framework\HTTP\Client\Curl $curl */
-            $curl = $this->curlFactory->create();
-            $curl->setHeaders($headers);
-            $curl->post("https://bpay.binanceapi.com/binancepay/openapi/v3/order", $json_request);
-            $result = $curl->getBody();
-
-            $result = json_decode($result, true);
-
-            if ($result['status'] == 'SUCCESS') {
+            if ($response['status'] == 'SUCCESS') {
                 $paymentMethod = $this->paymentMethodManagement->get($quote->getId());
-                $paymentMethod->setBinancePrepayId($result['data']['prepayId'])->save();
+                $paymentMethod->setBinancePrepayId($response['data']['prepayId'])->save();
 
-                $result = ['success' => true, 'checkoutUrl' => $result['data']['checkoutUrl']];
+                $result = ['success' => true, 'checkoutUrl' => $response['data']['checkoutUrl']];
+
+                $resultJson = $this->jsonFactory->create();
+                $resultJson->setData($result);
+                return $resultJson;
             }
-
-            $resultJson = $this->jsonFactory->create();
-            $resultJson->setData($result);
-            return $resultJson;
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
         }
-    }
-
-    protected function generateNonce($length = 32)
-    {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $nonce = '';
-        for ($i = 1; $i <= $length; $i++) {
-            $pos = mt_rand(0, strlen($chars) - 1);
-            $char = $chars[$pos];
-            $nonce .= $char;
-        }
-        return $nonce;
-    }
-
-    function generateUniqueMerchantTradeNo()
-    {
-        $datetime = new \DateTime();
-        $timestamp = $datetime->format('YmdHis');
-        $randomString = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 6);
-
-        $merchantTradeNo = $timestamp . $randomString;
-
-        return $merchantTradeNo;
-    }
-
-    function generateGoods($quoteItems)
-    {
-        $goodsArray = [];
-
-        foreach ($quoteItems as $item) {
-            $goodsArray[] = [
-                'goodsType' => '01',
-                'goodsName' => $item['name'],
-                'referenceGoodsId' => $item['sku']
-            ];
-        }
-
-        return $goodsArray;
     }
 }
