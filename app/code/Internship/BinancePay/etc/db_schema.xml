@@ -13,4 +13,42 @@
         <column xsi:type="varchar" name="binance_prepay_id" nullable="true" length="255"
                 comment="Binance unique order id"/>
     </table>
+
+    <table name="binancepay_order_payment">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="bigint" name="biz_id" nullable="false" comment="Prepay order ID"/>
+        <column xsi:type="varchar" name="biz_type" nullable="false" length="10" comment="Biz Type"/>
+        <column xsi:type="varchar" name="biz_id_str" nullable="false" length="50" comment="Biz ID as string"/>
+        <column xsi:type="varchar" name="biz_status" nullable="false" length="20" comment="Biz Status"/>
+        <column xsi:type="varchar" name="merchant_trade_no" nullable="false" length="255" comment="The order ID, Unique identifier for the request"/>
+        <column xsi:type="varchar" name="product_type" nullable="false" length="16" comment="Product Type"/>
+        <column xsi:type="varchar" name="product_name" nullable="false" length="256" comment="Product Name"/>
+        <column xsi:type="bigint" name="transact_time" nullable="false" comment="Transaction Time"/>
+        <column xsi:type="varchar" name="trade_type" nullable="false" length="20" comment="Trade Type"/>
+        <column xsi:type="decimal" name="total_fee" nullable="false" precision="20" comment="Total Fee"/>
+        <column xsi:type="varchar" name="currency" nullable="false" length="10" comment="Currency"/>
+        <column xsi:type="varchar" name="transaction_id" length="50" comment="Transaction ID"/>
+        <column xsi:type="varchar" name="open_user_id" length="50" comment="Open User ID"/>
+        <column xsi:type="decimal" name="commission" nullable="false" precision="20" comment="Commission"/>
+        <column xsi:type="bigint" name="payer_id" comment="Payer ID"/>
+        <column xsi:type="varchar" name="pay_method" length="50" comment="Pay Method"/>
+        <column xsi:type="varchar" name="instruction_currency" length="10" comment="Instructions currency"/>
+        <column xsi:type="decimal" name="instruction_amount" precision="20" comment="Instructions amount"/>
+        <column xsi:type="decimal" name="instruction_price" precision="20" comment="Instructions price"/>
+        <column xsi:type="varchar" name="instruction_channel" length="50" comment="Channel"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" identity="false" comment="Order ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+            <column name="order_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE_MERCHANT_TRADE_NO">
+            <column name="merchant_trade_no"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_BINANCEPAY_ORDER_PAYMENT_SALES_ORDER"
+                    table="binancepay_order_payment" column="order_id" referenceTable="sales_order"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="FK_BINANCEPAY_ORDER_PAYMENT_SALES_ORDER" indexType="btree">
+            <column name="order_id"/>
+        </index>
+    </table>
 </schema>
