@@ -1,8 +1,9 @@
 <?php
 /**
- * @author Barwenock
- * @copyright Copyright (c) Barwenock
- * @package Social Authorizes for Magento 2
+ * @category Internship
+ * @package Internship\BinancePay
+ * @author Andrii Tomkiv <tomkivandrii18@gmail.com>
+ * @copyright 2024 Tomkiv
  */
 
 declare(strict_types=1);
@@ -14,14 +15,19 @@ class BinancePay
     protected const BASE_URL = 'https://bpay.binanceapi.com';
     protected const BUILD_ORDER_ENDPOINT = '/binancepay/openapi/v3/order';
     protected const GET_CERTIFICATE_ENDPOINT = '/binancepay/openapi/certificates';
+    protected const BUILD_REFUND_ENDPOINT = '/binancepay/openapi/order/refund';
 
     /**
      * @param \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig
      * @param \Magento\Framework\HTTP\Client\CurlFactory $curlFactory
+     * @param \Magento\Framework\Url\DecoderInterface $decoder
+     * @param \Magento\Framework\Serialize\Serializer\Json $jsonSerializer
      */
     public function __construct(
-        protected \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig,
-        protected \Magento\Framework\HTTP\Client\CurlFactory $curlFactory,
+        private readonly \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig,
+        private readonly \Magento\Framework\HTTP\Client\CurlFactory $curlFactory,
+        private readonly \Magento\Framework\Url\DecoderInterface $decoder,
+        private readonly \Magento\Framework\Serialize\Serializer\Json $jsonSerializer
     ) {
     }
 
@@ -30,18 +36,49 @@ class BinancePay
      *
      * @param string $body
      * @return array
+     * @throws \Exception
      */
     public function buildOrder($body)
+    {
+        return $this->sendRequest(self::BUILD_ORDER_ENDPOINT, $body);
+    }
+
+    /**
+     * Builds a refund with the provided body data.
+     *
+     * @param string $body
+     * @return array
+     * @throws \Exception
+     */
+    public function buildRefund(string $body): array
+    {
+        return $this->sendRequest(self::BUILD_REFUND_ENDPOINT, $body);
+    }
+
+    /**
+     * Sends a request to the specified endpoint with the provided body data.
+     *
+     * @param string $endpoint
+     * @param string $body
+     * @return array
+     * @throws \Exception
+     */
+    private function sendRequest(string $endpoint, string $body): array
     {
         $timestamp = $this->getTimestamp();
         $nonce = $this->generateNonce();
         $headers = $this->buildHeaders($timestamp, $nonce, $body);
 
-        $curl = $this->curlFactory->create();
-        $curl->setHeaders($headers);
-        $curl->post(self::BASE_URL . self::BUILD_ORDER_ENDPOINT, $body);
-        $result = $curl->getBody();
-        return json_decode($result, true);
+        try {
+            $curl = $this->curlFactory->create();
+            $curl->setHeaders($headers);
+            $curl->post(self::BASE_URL . $endpoint, $body);
+
+            $result = $curl->getBody();
+            return $this->jsonSerializer->unserialize($result);
+        } catch (\Exception $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Request failed: ' . $e->getMessage()));
+        }
     }
 
     /**
@@ -55,7 +92,7 @@ class BinancePay
     {
         $timestamp = $this->getTimestamp();
         $nonce = $webhookHeaders['Binancepay-Nonce'];
-        $signature = base64_decode($webhookHeaders['Binancepay-Signature']);
+        $signature = $this->decoder->decode($webhookHeaders['Binancepay-Signature']);
 
         $requestHeaders = $this->buildHeaders($timestamp, $nonce, $body);
         $payload = $this->buildPayload($webhookHeaders['Binancepay-Timestamp'], $nonce, $body);
@@ -77,16 +114,16 @@ class BinancePay
         $curl->setHeaders($headers);
         $curl->post(self::BASE_URL . self::GET_CERTIFICATE_ENDPOINT, $body);
 
-        $result = json_decode($curl->getBody(), true);
+        $result = $this->jsonSerializer->unserialize($curl->getBody());
         return $result['data'][0]['certPublic'];
     }
 
     /**
      * Builds the headers required for Binance API requests.
      *
-     * @param $timestamp
-     * @param $nonce
-     * @param $body
+     * @param float $timestamp
+     * @param string $nonce
+     * @param string $body
      * @return array
      */
     protected function buildHeaders($timestamp, $nonce, $body): array
@@ -103,7 +140,7 @@ class BinancePay
     /**
      * Generates a nonce string of the given length.
      *
-     * @param $length
+     * @param int $length
      * @return string
      */
     protected function generateNonce($length = 32)
@@ -118,9 +155,9 @@ class BinancePay
     /**
      * Builds the payload for signature verification.
      *
-     * @param $timestamp
-     * @param $nonce
-     * @param $body
+     * @param float $timestamp
+     * @param string $nonce
+     * @param string $body
      * @return string
      */
     protected function buildPayload($timestamp, $nonce, $body)
@@ -139,9 +176,9 @@ class BinancePay
     /**
      * Generates a HMAC signature for the given data.
      *
-     * @param $timestamp
-     * @param $nonce
-     * @param $body
+     * @param float $timestamp
+     * @param string $nonce
+     * @param string $body
      * @return string
      */
     protected function getSignature($timestamp, $nonce, $body)

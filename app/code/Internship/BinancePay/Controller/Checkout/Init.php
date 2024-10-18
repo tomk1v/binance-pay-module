@@ -17,18 +17,22 @@ class Init implements \Magento\Framework\App\ActionInterface
      * @param \Magento\Checkout\Model\Session $session
      * @param \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement
      * @param \Internship\BinancePay\Service\BinancePay $binancePayService
-     * @param \Internship\BinancePay\Model\Order\Mapping $orderMapping
+     * @param \Internship\BinancePay\Model\Payment\Mapping $mapping
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      */
     public function __construct(
-        protected \Magento\Framework\Controller\Result\JsonFactory $jsonFactory,
-        protected \Magento\Checkout\Model\Session $session,
-        protected \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement,
-        protected \Internship\BinancePay\Service\BinancePay $binancePayService,
-        protected \Internship\BinancePay\Model\Order\Mapping $orderMapping
+        private readonly \Magento\Framework\Controller\Result\JsonFactory $jsonFactory,
+        private readonly \Magento\Checkout\Model\Session $session,
+        private readonly \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement,
+        private readonly \Internship\BinancePay\Service\BinancePay $binancePayService,
+        private readonly \Internship\BinancePay\Model\Payment\Mapping $mapping,
+        private readonly \Magento\Framework\Serialize\SerializerInterface $serializer
     ) {
     }
 
     /**
+     * Initialize Binance Pay checkout
+     *
      * @return \Magento\Framework\Controller\Result\Json
      * @throws \Exception
      */
@@ -36,7 +40,7 @@ class Init implements \Magento\Framework\App\ActionInterface
     {
         try {
             $quote = $this->session->getQuote();
-            $body = json_encode($this->orderMapping->mapRequestBody($quote));
+            $body = $this->serializer->serialize($this->mapping->mapOrderBody($quote));
 
             $response = $this->binancePayService->buildOrder($body);
 
@@ -51,7 +55,7 @@ class Init implements \Magento\Framework\App\ActionInterface
                 return $resultJson;
             }
         } catch (\Exception $exception) {
-            throw new \Exception($exception->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(__($exception->getMessage()));
         }
     }
 }

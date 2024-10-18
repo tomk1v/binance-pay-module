@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Internship\BinancePay\Model\Queue\Order;
 
-class Publisher
+class CreationPublisher
 {
     private const QUEUE_TOPIC = 'binance.order.creation';
 

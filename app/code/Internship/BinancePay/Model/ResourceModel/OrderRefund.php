@@ -10,12 +10,12 @@ declare(strict_types=1);
 
 namespace Internship\BinancePay\Model\ResourceModel;
 
-class BinancePay extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+class OrderRefund extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
     /**
      * @var string
      */
-    const TABLE_NAME = 'binancepay_order_payment';
+    private const TABLE_NAME = 'binancepay_order_refund';
 
     /**
      * Resource initialization
@@ -24,6 +24,6 @@ class BinancePay extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     public function _construct()
     {
-        $this->_init(self::TABLE_NAME, \Internship\BinancePay\Api\Data\BinancePayInterface::ENTITY_ID);
+        $this->_init(self::TABLE_NAME, \Internship\BinancePay\Api\Data\OrderRefundInterface::ENTITY_ID);
     }
 }

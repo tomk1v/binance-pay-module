@@ -10,24 +10,34 @@ declare(strict_types=1);
 
 namespace Internship\BinancePay\Model;
 
-class BinancePay extends \Magento\Framework\Model\AbstractModel
-    implements \Internship\BinancePay\Api\Data\BinancePayInterface
+class OrderPayment extends \Magento\Framework\Model\AbstractModel implements
+    \Internship\BinancePay\Api\Data\OrderPaymentInterface
 {
     /**
      * @var string
      */
-    protected $_idFieldName = \Internship\BinancePay\Api\Data\BinancePayInterface::ENTITY_ID; //@codingStandardsIgnoreLine
+    protected $_idFieldName = \Internship\BinancePay\Api\Data\OrderPaymentInterface::ENTITY_ID; //@codingStandardsIgnoreLine
 
     /**
      * @inheritdoc
      */
     protected function _construct() //@codingStandardsIgnoreLine
     {
-        $this->_init(\Internship\BinancePay\Model\ResourceModel\BinancePay::class);
+        $this->_init(\Internship\BinancePay\Model\ResourceModel\OrderPayment::class);
     }
 
     /**
-     * Get biz by id
+     * Get biz by id.
+     *
+     * @return int
+     */
+    public function getEntityId()
+    {
+        return $this->getData(self::ENTITY_ID);
+    }
+
+    /**
+     * Get biz by id.
      *
      * @return int
      */
@@ -37,10 +47,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set biz id
+     * Set biz id.
      *
      * @param int $bizId
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setBizId($bizId)
     {
@@ -48,7 +58,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get a biz type
+     * Get a biz type.
      *
      * @return int
      */
@@ -58,18 +68,18 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set biz id
+     * Set biz id.
      *
      * @param int $bizType
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setBizType($bizType)
     {
-        return $this->setData(self::BIZ_ID, $bizType);
+        return $this->setData(self::BIZ_TYPE, $bizType);
     }
 
     /**
-     * Get biz id str
+     * Get biz id str.
      *
      * @return string
      */
@@ -79,10 +89,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set biz id str
+     * Set biz id str.
      *
      * @param string $bizIdStr
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setBizIdStr($bizIdStr)
     {
@@ -90,7 +100,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get biz status
+     * Get biz status.
      *
      * @return string
      */
@@ -100,10 +110,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set biz status
+     * Set biz status.
      *
      * @param string $bizStatus
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setBizStatus($bizStatus)
     {
@@ -111,7 +121,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get merchantTradeNo
+     * Get merchant trade no.
      *
      * @return string
      */
@@ -121,10 +131,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set merchantTradeNo
+     * Set merchant trade no.
      *
      * @param string $merchantTradeNo
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setMerchantTradeNo($merchantTradeNo)
     {
@@ -132,7 +142,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get productType
+     * Get a product type.
      *
      * @return string
      */
@@ -142,8 +152,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Set a product type.
+     *
      * @param string $productType
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setProductType($productType)
     {
@@ -151,7 +163,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get productName
+     * Get product name.
      *
      * @return string
      */
@@ -161,10 +173,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set productName
+     * Set product name.
      *
      * @param string $productName
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setProductName($productName)
     {
@@ -172,7 +184,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get transactTime
+     * Get transact time.
      *
      * @return int
      */
@@ -182,10 +194,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set transactTime
+     * Set transact time.
      *
      * @param string $transactTime
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setTransactTime($transactTime)
     {
@@ -193,7 +205,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get transactTime
+     * Get a trade type.
      *
      * @return string
      */
@@ -203,10 +215,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set tradeType
+     * Set a trade type.
      *
      * @param string $tradeType
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setTradeType($tradeType)
     {
@@ -214,7 +226,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get totalFee
+     * Get total fee.
      *
      * @return float
      */
@@ -224,10 +236,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set totalFee
+     * Set total fee.
      *
      * @param float $totalFee
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setTotalFee($totalFee)
     {
@@ -235,7 +247,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get currency
+     * Get currency.
      *
      * @return string
      */
@@ -245,10 +257,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set currency
+     * Set currency.
      *
-     * @param $currency
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @param string $currency
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setCurrency($currency)
     {
@@ -256,7 +268,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get transactionId
+     * Get transaction id.
      *
      * @return string
      */
@@ -266,10 +278,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set transactionId
+     * Set transaction id.
      *
      * @param string $transactionId
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setTransactionId($transactionId)
     {
@@ -277,7 +289,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get openUserId
+     * Get open user id.
      *
      * @return string
      */
@@ -287,10 +299,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set openUserId
+     * Set open user id.
      *
      * @param string $openUserId
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setOpenUserId($openUserId)
     {
@@ -298,7 +310,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get commission
+     * Get commission.
      *
      * @return string
      */
@@ -308,10 +320,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set commission
+     * Set commission.
      *
      * @param string $commission
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setCommission($commission)
     {
@@ -319,7 +331,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get payerId
+     * Get payer id.
      *
      * @return string
      */
@@ -329,10 +341,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set payerId
+     * Set payer id.
      *
      * @param string $payerId
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setPayerId($payerId)
     {
@@ -340,7 +352,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get payMethod
+     * Get pay method.
      *
      * @return string
      */
@@ -350,10 +362,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set payMethod
+     * Set pay method.
      *
      * @param string $payMethod
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setPayMethod($payMethod)
     {
@@ -361,7 +373,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get instructionCurrency
+     * Get instruction currency.
      *
      * @return string
      */
@@ -371,10 +383,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set instructionCurrency
+     * Set instruction currency.
      *
      * @param string $instructionCurrency
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setInstructionCurrency($instructionCurrency)
     {
@@ -382,7 +394,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get instructionAmount
+     * Get instruction amount.
      *
      * @return float
      */
@@ -392,10 +404,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set commission
+     * Set commission.
      *
      * @param float $instructionAmount
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setInstructionAmount($instructionAmount)
     {
@@ -403,7 +415,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get instructionPrice
+     * Get instruction price.
      *
      * @return float
      */
@@ -413,10 +425,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set instructionPrice
+     * Set instruction price.
      *
      * @param float $instructionPrice
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setInstructionPrice($instructionPrice)
     {
@@ -424,28 +436,49 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get instructionChannel
+     * Get channel.
      *
      * @return string
      */
-    public function getInstructionChannel()
+    public function getChannel()
     {
-        return $this->getData(self::INSTRUCTION_CHANNEL);
+        return $this->getData(self::CHANNEL);
     }
 
     /**
-     * Set instructionChannel
+     * Set channel.
      *
-     * @param string $instructionChannel
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @param string $channel
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
-    public function setInstructionChanel($instructionChannel)
+    public function setChannel($channel)
     {
-        return $this->setData(self::INSTRUCTION_CHANNEL, $instructionChannel);
+        return $this->setData(self::CHANNEL, $channel);
     }
 
     /**
-     * Get createdAt
+     * Get order id.
+     *
+     * @return string
+     */
+    public function getOrderId()
+    {
+        return $this->getData(self::ORDER_ID);
+    }
+
+    /**
+     * Set order id.
+     *
+     * @param string $orderId
+     * @return \Internship\BinancePay\Model\OrderPayment
+     */
+    public function setOrderId($orderId)
+    {
+        return $this->setData(self::ORDER_ID, $orderId);
+    }
+
+    /**
+     * Get created at.
      *
      * @return string
      */
@@ -455,10 +488,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set createdAt
+     * Set created at.
      *
      * @param string $createdAt
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setCreatedAt(string $createdAt)
     {
@@ -466,7 +499,7 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get updatedAt
+     * Get updated at.
      *
      * @return string
      */
@@ -476,10 +509,10 @@ class BinancePay extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set updatedAt
+     * Set updated at.
      *
      * @param string $updatedAt
-     * @return \Internship\BinancePay\Model\BinancePay
+     * @return \Internship\BinancePay\Model\OrderPayment
      */
     public function setUpdatedAt(string $updatedAt)
     {

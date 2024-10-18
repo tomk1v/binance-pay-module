@@ -14,32 +14,37 @@
                 comment="Binance unique order id"/>
     </table>
 
-    <table name="binancepay_order_payment">
+    <table name="binancepay_order_payment" resource="default" engine="innodb">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="bigint" name="biz_id" nullable="false" comment="Prepay order ID"/>
         <column xsi:type="varchar" name="biz_type" nullable="false" length="10" comment="Biz Type"/>
         <column xsi:type="varchar" name="biz_id_str" nullable="false" length="50" comment="Biz ID as string"/>
         <column xsi:type="varchar" name="biz_status" nullable="false" length="20" comment="Biz Status"/>
-        <column xsi:type="varchar" name="merchant_trade_no" nullable="false" length="255" comment="The order ID, Unique identifier for the request"/>
+        <column xsi:type="varchar" name="merchant_trade_no" nullable="false"
+                length="255" comment="The order ID, Unique identifier for the request"/>
         <column xsi:type="varchar" name="product_type" nullable="false" length="16" comment="Product Type"/>
         <column xsi:type="varchar" name="product_name" nullable="false" length="256" comment="Product Name"/>
         <column xsi:type="bigint" name="transact_time" nullable="false" comment="Transaction Time"/>
         <column xsi:type="varchar" name="trade_type" nullable="false" length="20" comment="Trade Type"/>
-        <column xsi:type="decimal" name="total_fee" nullable="false" precision="20" comment="Total Fee"/>
+        <column xsi:type="decimal" name="total_fee" nullable="false" precision="20" scale="10" comment="Total Fee"/>
         <column xsi:type="varchar" name="currency" nullable="false" length="10" comment="Currency"/>
         <column xsi:type="varchar" name="transaction_id" length="50" comment="Transaction ID"/>
         <column xsi:type="varchar" name="open_user_id" length="50" comment="Open User ID"/>
-        <column xsi:type="decimal" name="commission" nullable="false" precision="20" comment="Commission"/>
+        <column xsi:type="decimal" name="commission" nullable="false" precision="20" scale="10" comment="Commission"/>
         <column xsi:type="bigint" name="payer_id" comment="Payer ID"/>
         <column xsi:type="varchar" name="pay_method" length="50" comment="Pay Method"/>
         <column xsi:type="varchar" name="instruction_currency" length="10" comment="Instructions currency"/>
-        <column xsi:type="decimal" name="instruction_amount" precision="20" comment="Instructions amount"/>
-        <column xsi:type="decimal" name="instruction_price" precision="20" comment="Instructions price"/>
-        <column xsi:type="varchar" name="instruction_channel" length="50" comment="Channel"/>
+        <column xsi:type="decimal" name="instruction_amount" precision="20" scale="10" comment="Instructions amount"/>
+        <column xsi:type="decimal" name="instruction_price" precision="20" scale="10" comment="Instructions price"/>
+        <column xsi:type="varchar" name="channel" length="50" comment="Channel"/>
         <column xsi:type="int" name="order_id" unsigned="true" nullable="false" identity="false" comment="Order ID"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false"
+                default="CURRENT_TIMESTAMP" on_update="false" comment="Creation Timestamp"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false"
+                default="CURRENT_TIMESTAMP" on_update="true" comment="Last Updated Timestamp"/>
+
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
-            <column name="order_id"/>
         </constraint>
         <constraint xsi:type="unique" referenceId="UNIQUE_MERCHANT_TRADE_NO">
             <column name="merchant_trade_no"/>
@@ -50,5 +55,43 @@
         <index referenceId="FK_BINANCEPAY_ORDER_PAYMENT_SALES_ORDER" indexType="btree">
             <column name="order_id"/>
         </index>
+        <index referenceId="IDX_BIZ_ID" indexType="btree">
+            <column name="biz_id"/>
+        </index>
+    </table>
+
+    <table name="binancepay_order_refund" resource="default" engine="innodb" comment="Refunds Table">
+        <column xsi:type="int" name="entity_id" unsigned="true"
+                nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="bigint" name="refund_id" nullable="false" comment="Refund ID"/>
+        <column xsi:type="varchar" name="refund_request_id" nullable="false" length="64" comment="Refund Request ID"/>
+        <column xsi:type="bigint" name="prepay_id" nullable="false" comment="Prepay ID"/>
+        <column xsi:type="decimal" name="order_amount" nullable="false"
+                precision="20" scale="10" comment="Order Amount"/>
+        <column xsi:type="decimal" name="refunded_amount" nullable="false"
+                precision="20" scale="10" comment="Refunded Amount"/>
+        <column xsi:type="decimal" name="refund_amount" nullable="false"
+                precision="20" scale="10" comment="Refund Amount"/>
+        <column xsi:type="int" name="remaining_attempts" nullable="false" comment="Remaining Attempts"/>
+        <column xsi:type="varchar" name="payer_open_id" nullable="false" length="32" comment="Payer Open ID"/>
+        <column xsi:type="varchar" name="duplicate_request" nullable="false" length="1" comment="Duplicate Request Flag"/>
+        <column xsi:type="varchar" name="refund_status" nullable="false"
+                length="20" default="PENDING" comment="Refund Status"/>
+        <column xsi:type="decimal" name="refund_commission" nullable="false"
+                precision="20" scale="10" comment="Refund Commission"/>
+        <column xsi:type="decimal" name="refunded_commission" nullable="false"
+                precision="20" scale="10" comment="Refunded Commission"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false"
+                default="CURRENT_TIMESTAMP" on_update="false" comment="Creation Timestamp"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false"
+                default="CURRENT_TIMESTAMP" on_update="true" comment="Last Updated Timestamp"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign" referenceId="FK_BINANCEPAY_ORDER_REFUND_BINANCEPAY_ORDER_PAYMENTS"
+                    table="binancepay_order_refund" column="prepay_id"
+                    referenceTable="binancepay_order_payment" referenceColumn="biz_id"
+                    onDelete="CASCADE"/>
     </table>
 </schema>

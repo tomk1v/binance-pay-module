@@ -18,22 +18,14 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     protected $scopeConfig;
 
     /**
-     * @var \Magento\Cookie\Helper\Cookie
-     */
-    protected $cookieHelper;
-
-    /**
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Cookie\Helper\Cookie $cookieHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Cookie\Helper\Cookie $cookieHelper
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->scopeConfig = $scopeConfig;
-        $this->cookieHelper = $cookieHelper;
         parent::__construct($context);
     }
 
@@ -66,7 +58,7 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get secret key
      *
-     * @return mixed
+     * @return string
      */
     public function getSecretKey()
     {

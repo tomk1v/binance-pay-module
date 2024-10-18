@@ -12,8 +12,8 @@ namespace Internship\BinancePay\Controller\Checkout;
 
 class Success implements \Magento\Framework\App\ActionInterface
 {
-    protected const SUCCESS_ROUTE = 'checkout/onepage/success';
-    protected const CART_ROUTE = 'checkout/cart/index';
+    private const SUCCESS_ROUTE = 'checkout/onepage/success';
+    private const CART_ROUTE = 'checkout/cart/index';
 
     /**
      * @param \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
@@ -23,11 +23,11 @@ class Success implements \Magento\Framework\App\ActionInterface
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
-        protected \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
-        protected \Magento\Framework\App\RequestInterface $request,
-        protected \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        protected \Magento\Checkout\Model\Session $checkoutSession,
-        protected \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+        private readonly \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
+        private readonly \Magento\Framework\App\RequestInterface $request,
+        private readonly \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
+        private readonly \Magento\Checkout\Model\Session $checkoutSession,
+        private readonly \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
     }
 

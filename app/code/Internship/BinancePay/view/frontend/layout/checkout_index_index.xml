@@ -23,8 +23,14 @@
                                             <item name="children" xsi:type="array">
                                                 <item name="payment" xsi:type="array">
                                                     <item name="children" xsi:type="array">
+                                                        <item name="additional-payment-validators" xsi:type="array">
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="binancepay-validator" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Internship_BinancePay/js/view/payment/binancepay-validator</item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
                                                         <item name="renders" xsi:type="array">
-                                                            <!-- merge payment method renders here -->
                                                             <item name="children" xsi:type="array">
                                                                 <item name="binancepay" xsi:type="array">
                                                                     <item name="component" xsi:type="string">Internship_BinancePay/js/view/payment/method-renderer</item>

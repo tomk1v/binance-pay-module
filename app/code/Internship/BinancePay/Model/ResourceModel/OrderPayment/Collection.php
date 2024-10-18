@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Internship\BinancePay\Model\ResourceModel\BinancePay;
+namespace Internship\BinancePay\Model\ResourceModel\OrderPayment;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
@@ -17,8 +17,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected function _construct() //@codingStandardsIgnoreLine
     {
-        $this->_init(\Internship\BinancePay\Model\BinancePay::class,
-            \Internship\BinancePay\Model\ResourceModel\BinancePay::class);
+        $this->_init(
+            \Internship\BinancePay\Model\OrderPayment::class,
+            \Internship\BinancePay\Model\ResourceModel\OrderPayment::class
+        );
     }
 }
-
