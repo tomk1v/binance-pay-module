@@ -30,7 +30,7 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get module status
+     * Get module status.
      *
      * @return mixed
      */
@@ -43,7 +43,7 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get api key
+     * Get api key.
      *
      * @return mixed
      */
@@ -56,7 +56,7 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get secret key
+     * Get secret key.
      *
      * @return string
      */
@@ -64,6 +64,19 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             'payment/binancepay/secret_key',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get crypto symbol.
+     *
+     * @return string
+     */
+    public function getCryptoSymbol()
+    {
+        return $this->scopeConfig->getValue(
+            'payment/binancepay/crypto_symbol',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }

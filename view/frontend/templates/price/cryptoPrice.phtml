@@ -1,0 +1,19 @@
+<?php
+/**
+ * @category Internship
+ * @package Internship\BinancePay
+ * @author Andrii Tomkiv <tomkivandrii18@gmail.com>
+ * @copyright 2024 Tomkiv
+ */
+?>
+<?php
+/**
+ * @var \Internship\BinancePay\Block\CryptoPrice $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="crypto-price">
+    <span class="crypto-amount" data-amount="<?= $escaper->escapeHtml($block->getAmount()); ?>">
+        <?= $escaper->escapeHtml($block->getCryptoPriceHtml()); ?>
+    </span>
+</div>

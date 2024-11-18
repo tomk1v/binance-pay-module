@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Internship
+ * @package Internship\BinancePay
+ * @author Andrii Tomkiv <tomkivandrii18@gmail.com>
+ * @copyright 2024 Tomkiv
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="category.products.list">
+            <block class="Internship\BinancePay\Block\CryptoPrice" name="product.crypto.price"
+                   template="Internship_BinancePay::price/cryptoPrice.phtml" after="product.info.price"
+                   ifconfig="payment/binancepay/show_on_category"
+                   cacheable="false"/>
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Internship_BinancePay::product/list.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="after.body.start">
+            <block class="Internship\BinancePay\Block\CryptoPrice" name="product.crypto.price.config"
+                   template="Internship_BinancePay::price/cryptoPriceConfig.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

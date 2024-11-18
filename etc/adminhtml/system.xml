@@ -57,6 +57,35 @@
                         <field id="active">1</field>
                     </depends>
                 </field>
+                <field id="show_on_category" translate="label" type="select" sortOrder="45"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Display Crypto Price Block on Category Pages</label>
+                    <comment>Enable or disable the display of the cryptocurrency price block on category listing pages.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+
+                <field id="show_on_product" translate="label" type="select" sortOrder="50"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Display Crypto Price Block on Product Pages</label>
+                    <comment>Enable or disable the display of the cryptocurrency price block on individual product pages.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+
+                <field id="crypto_symbol" translate="label" type="select" sortOrder="55"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Cryptocurrency Symbol for Storefront Display</label>
+                    <comment>Choose the cryptocurrency trading pair (e.g., BTC/USDT) to use for price calculations and display on the storefront.</comment>
+                    <source_model>Internship\BinancePay\Model\Config\Source\CryptoSymbols</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
             </group>
         </section>
     </system>
