@@ -36,9 +36,10 @@ define(['jquery'], function ($) {
                 $('.crypto-amount').each(function () {
                     const defaultPrice = parseFloat($(this).data('amount'));
                     const cryptoPrice = (defaultPrice / avgPriceInUsdt).toFixed(6);
+                    const symbol = config.symbol.replace('usdt', '').toUpperCase();
 
                     $(this).fadeOut(200, function () {
-                        $(this).text(`Crypto Price: ${cryptoPrice} USD`).fadeIn(200);
+                        $(this).text(`Crypto Price: ${cryptoPrice} ${symbol}`).fadeIn(200);
                     });
                 });
             };
