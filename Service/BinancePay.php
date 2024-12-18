@@ -13,8 +13,10 @@ namespace Internship\BinancePay\Service;
 class BinancePay
 {
     protected const BASE_URL = 'https://bpay.binanceapi.com';
+    protected const BASE_URL_CURRENCY = 'https://www.binance.com';
     protected const BUILD_ORDER_ENDPOINT = '/binancepay/openapi/v3/order';
     protected const GET_CERTIFICATE_ENDPOINT = '/binancepay/openapi/certificates';
+    protected const GET_CURRENCIES_ENDPOINT = '/bapi/asset/v1/public/asset-service/product/currency';
     protected const BUILD_REFUND_ENDPOINT = '/binancepay/openapi/order/refund';
 
     /**
@@ -53,6 +55,40 @@ class BinancePay
     public function buildRefund(string $body): array
     {
         return $this->sendRequest(self::BUILD_REFUND_ENDPOINT, $body);
+    }
+
+    /**
+     * Fetches the list of supported currencies.
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getSupportedCurrencies(): array
+    {
+        try {
+            $curl = $this->curlFactory->create();
+            $curl->setOption(CURLOPT_ENCODING, '');
+            $curl->get(self::BASE_URL_CURRENCY . self::GET_CURRENCIES_ENDPOINT);
+
+            $response = $curl->getBody();
+            $data = $this->jsonSerializer->unserialize($response);
+            if (isset($data['data']) && is_array($data['data'])) {
+                $currencies = [];
+                foreach ($data['data'] as $currency) {
+                    if (isset($currency['pair'])) {
+                        $pair = explode('_', $currency['pair']);
+                        if (isset($pair[0])) {
+                            $currencies[] = $pair[0];
+                        }
+                    }
+                }
+                return $currencies;
+            }
+        } catch (\Exception $exception) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($exception->getMessage()));
+        }
+
+        return [];
     }
 
     /**

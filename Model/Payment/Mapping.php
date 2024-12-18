@@ -15,35 +15,49 @@ class Mapping
     /**
      * @param \DateTime $dateTime
      * @param \Magento\Framework\UrlInterface $url
+     * @param \Internship\BinancePay\Model\Cache\Currency $currency
      */
     public function __construct(
         private readonly \DateTime $dateTime,
-        private readonly \Magento\Framework\UrlInterface $url
+        private readonly \Magento\Framework\UrlInterface $url,
+        private readonly \Internship\BinancePay\Model\Cache\Currency $currency
     ) {
     }
 
     /**
      * Map body for order creation.
      *
-     * @param object $quote
+     * @param \Magento\Quote\Model\Quote $quote
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function mapOrderBody($quote)
     {
-        return [
-            'env' => [
-                'terminalType' => 'WEB'
-            ],
-            'orderTags' => [
-                'ifProfitSharing' => false
-            ],
-            'merchantTradeNo' => $this->generateUniqueMerchantTradeNo(),
-            'orderAmount' => $quote->getGrandTotal(),
-            'currency' => 'USDT',
-            'description' => $this->getQuoteItemsDescription($quote->getItems()),
-            'goodsDetails' => $this->generateGoods($quote->getItems()),
-            'returnUrl' => $this->getReturnUrl() . '?quoteId=' . $quote->getId()
-        ];
+        try {
+            $currencies = $this->currency->getCurrencies();
+
+            if (!in_array($quote->getQuoteCurrencyCode(), $currencies)) {
+                throw new \Magento\Framework\Exception\LocalizedException(__('Currency is not supported.'));
+            }
+
+            return [
+                'env' => [
+                    'terminalType' => 'WEB'
+                ],
+                'orderTags' => [
+                    'ifProfitSharing' => false
+
+                ],
+                'merchantTradeNo' => $this->generateUniqueMerchantTradeNo(),
+                'fiatAmount' => $quote->getGrandTotal(),
+                'fiatCurrency' => $quote->getQuoteCurrencyCode(),
+                'description' => $this->getQuoteItemsDescription($quote->getItems()),
+                'goodsDetails' => $this->generateGoods($quote->getItems()),
+                'returnUrl' => $this->getReturnUrl() . '?quoteId=' . $quote->getId()
+            ];
+        } catch (\Exception $exception) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($exception->getMessage()));
+        }
     }
 
     /**
