@@ -46,6 +46,7 @@ class RefundAdapterPlugin
         \Magento\Sales\Api\Data\OrderInterface $order,
         $isOnline = false
     ) {
+//         TODO: Need to implement logic with partial refund
         if ($order->getPayment()->getMethod() === 'binancepay') {
             $searchCriteria = $this->searchCriteriaBuilder->addFilter('order_id', $order->getId())->create();
             $searchResult = $this->binancePayRepository->getList($searchCriteria)->getItems();
