@@ -43,8 +43,7 @@ class Init implements \Magento\Framework\App\ActionInterface
             $body = $this->serializer->serialize($this->mapping->mapOrderBody($quote));
 
             $response = $this->binancePayService->buildOrder($body);
-
-            if ($response['status'] == 'SUCCESS') {
+            if (isset($response['status']) && $response['status'] === 'SUCCESS') {
                 $paymentMethod = $this->paymentMethodManagement->get($quote->getId());
                 $paymentMethod->setBinancePrepayId($response['data']['prepayId'])->save();
 
