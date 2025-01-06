@@ -48,11 +48,12 @@ class Init implements \Magento\Framework\App\ActionInterface
                 $paymentMethod->setBinancePrepayId($response['data']['prepayId'])->save();
 
                 $result = ['success' => true, 'checkoutUrl' => $response['data']['checkoutUrl']];
-
-                $resultJson = $this->jsonFactory->create();
-                $resultJson->setData($result);
-                return $resultJson;
+            } else {
+                $result = ['success' => false, 'message' => 'Unable to process payment. Please try again later.'];
             }
+            $resultJson = $this->jsonFactory->create();
+            $resultJson->setData($result);
+            return $resultJson;
         } catch (\Exception $exception) {
             throw new \Magento\Framework\Exception\LocalizedException(__($exception->getMessage()));
         }
