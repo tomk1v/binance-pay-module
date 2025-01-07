@@ -4,7 +4,7 @@
  * @category Internship
  * @package Internship\BinancePay
  * @author Andrii Tomkiv <tomkivandrii18@gmail.com>
- * @copyright 2024 Tomkiv
+ * @copyright 2025 Tomkiv
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -58,6 +58,20 @@
     <type name="Magento\Payment\Gateway\Config\ConfigValueHandler">
         <arguments>
             <argument name="configInterface" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+
+    <type name="Internship\BinancePay\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Internship\BinancePay\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">binancePay</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Internship\BinancePay\Logger\Handler</item>
+            </argument>
         </arguments>
     </type>
 </config>
