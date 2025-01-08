@@ -3,10 +3,12 @@
  * @category Internship
  * @package Internship\BinancePay
  * @author Andrii Tomkiv <tomkivandrii18@gmail.com>
- * @copyright 2024 Tomkiv
+ * @copyright 2025 Tomkiv
  */
 
-namespace Test\Unit\Service;
+declare(strict_types=1);
+
+namespace Internship\BinancePay\Test\Unit\Service;
 
 class BinancePayTest extends \PHPUnit\Framework\TestCase
 {

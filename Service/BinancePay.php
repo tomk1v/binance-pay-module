@@ -3,7 +3,7 @@
  * @category Internship
  * @package Internship\BinancePay
  * @author Andrii Tomkiv <tomkivandrii18@gmail.com>
- * @copyright 2024 Tomkiv
+ * @copyright 2025 Tomkiv
  */
 
 declare(strict_types=1);
@@ -12,12 +12,12 @@ namespace Internship\BinancePay\Service;
 
 class BinancePay
 {
-    protected const BASE_URL = 'https://bpay.binanceapi.com';
-    protected const BASE_URL_CURRENCY = 'https://www.binance.com';
-    protected const BUILD_ORDER_ENDPOINT = '/binancepay/openapi/v3/order';
-    protected const GET_CERTIFICATE_ENDPOINT = '/binancepay/openapi/certificates';
-    protected const GET_CURRENCIES_ENDPOINT = '/bapi/asset/v1/public/asset-service/product/currency';
-    protected const BUILD_REFUND_ENDPOINT = '/binancepay/openapi/order/refund';
+    public const BASE_URL = 'https://bpay.binanceapi.com';
+    public const BASE_URL_CURRENCY = 'https://www.binance.com';
+    public const BUILD_ORDER_ENDPOINT = '/binancepay/openapi/v3/order';
+    public const GET_CERTIFICATE_ENDPOINT = '/binancepay/openapi/certificates';
+    public const GET_CURRENCIES_ENDPOINT = '/bapi/asset/v1/public/asset-service/product/currency';
+    public const BUILD_REFUND_ENDPOINT = '/binancepay/openapi/order/refund';
 
     /**
      * @param \Internship\BinancePay\Helper\Adminhtml\Config $adminConfig
