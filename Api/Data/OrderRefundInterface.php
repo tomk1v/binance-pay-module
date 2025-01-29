@@ -2,7 +2,8 @@
 /**
  * @category Internship
  * @package Internship\BinancePay
- * @author
+ * @author Andrii Tomkiv <tomkivandrii18@gmail.com>
+ * @copyright 2025 Tomkiv
  */
 
 declare(strict_types=1);
